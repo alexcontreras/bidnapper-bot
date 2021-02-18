@@ -4,13 +4,14 @@ const dotenv = require('dotenv').config();
 const express = require('express');
 
 const app = express();
+const PORT = 3022;
 
 app.get('/bot', (req, res) => {
-    res.send('');
-    bidnapperBot();
+    res.send('200 OK');
+    //bidnapperBot();
 });
 
-app.listen(3333, () => console.log('Server listening on port 3000!'));
+app.listen(PORT, () => console.log(`Server listening on port ${PORT}!`));
 
 async function bidnapperBot() {
     const screen = {
