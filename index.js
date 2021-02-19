@@ -2,18 +2,33 @@ const { Builder, By } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
 const dotenv = require('dotenv').config();
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express();
+app.use(bodyParser.json());
 const PORT = 3022;
 
-app.get('/bot', (req, res) => {
-    res.send('200 OK');
-    //bidnapperBot();
+app.post('/bot', (req, res) => {
+    const data = req.body;
+    let bulkStr = '';
+
+    data.map(item => {
+        const {id, max_amount } = item;
+        const moneyRegx = /^\d+(?:\.\d{0,2})$/;
+        if (moneyRegx.test(max_amount)) {
+            bulkStr += `${id}, ${max_amount}, ebay, 1\n`;
+            console.log(bulkStr);
+            bidnapperBot(bulkStr);
+            res.status(200).send({ message: 'Successful'});
+        } else {
+            res.status(422).send({ message: 'Unprocessable entity.'});
+        }
+    });
 });
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}!`));
 
-async function bidnapperBot() {
+async function bidnapperBot(input) {
     const screen = {
         width: 640,
         height: 480,
@@ -45,9 +60,7 @@ async function bidnapperBot() {
         await driver.manage().setTimeouts({ implicit: 1000 });
 
         const textArea = await driver.findElement(By.name('data'));
-        textArea.sendKeys(
-            '133206543187, 0, ebay, 1\n224281699354, 0, ebay, 1\n'
-        );
+        textArea.sendKeys(input);
 
         console.log('Inserting bulk...');
         await driver.findElement(By.name('massadd')).click();
