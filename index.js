@@ -11,19 +11,18 @@ const PORT = 3022;
 app.post('/bot', (req, res) => {
     const data = req.body;
     let bulkStr = '';
+    let status, message;
 
     data.map(item => {
         const {id, max_amount } = item;
         const moneyRegx = /^\d+(?:\.\d{0,2})$/;
         if (moneyRegx.test(max_amount)) {
             bulkStr += `${id}, ${max_amount}, ebay, 1\n`;
-            console.log(bulkStr);
-            bidnapperBot(bulkStr);
-            res.status(200).send({ message: 'Successful'});
-        } else {
-            res.status(422).send({ message: 'Unprocessable entity.'});
         }
     });
+
+    bidnapperBot(bulkStr);
+    res.status(200).send({message: 'Success'})
 });
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}!`));
